@@ -24,6 +24,7 @@
     "@types/styled-components": "^5.1.11",
     "auth0-js": "^9.16.2",
     "axios": "^0.21.1",
+    "prettier": "^2.7.1",
     "typescript": ">=3.8.0"
   },
   "scripts": {

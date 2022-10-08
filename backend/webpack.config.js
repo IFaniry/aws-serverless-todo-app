@@ -2,6 +2,9 @@ const path = require('path');
 const slsw = require('serverless-webpack');
 // var nodeExternals = require('webpack-node-externals')
 
+// TODO: https://medium.com/@sheepsteak/excluding-the-aws-sdk-from-a-serverless-package-8dcad2f31954
+// TODO: https://github.com/typedorm/typedorm-examples/tree/main/examples/aws-sdk-v3-typescript-webpack
+
 module.exports = {
   mode: slsw.lib.webpack.isLocal ? 'development' : 'production',
   entry: slsw.lib.entries,

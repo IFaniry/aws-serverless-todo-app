@@ -8,7 +8,12 @@
     "noUnusedParameters": true,
     "sourceMap": true,
     "target": "es2017",
-    "outDir": "lib"
+    "outDir": "lib",
+    // https://www.npmjs.com/package/zod
+    "strict": true,
+    // https://github.com/typedorm/typedorm#typescript-configuration
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
   },
   "exclude": [
     "node_modules"

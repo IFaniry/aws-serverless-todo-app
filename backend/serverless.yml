@@ -10,7 +10,7 @@ plugins:
   - serverless-iam-roles-per-function
   - serverless-plugin-tracing
   - serverless-offline
-
+  - serverless-dotenv-plugin
 provider:
   name: aws
   runtime: nodejs16.x
@@ -34,10 +34,10 @@ provider:
   # ${self:provider.environment.ATTACHMENT_S3_BUCKET}
   # https://github.com/neverendingqs/serverless-dotenv-plugin
   environment:
-    TODOS_TABLE: Todos-${sls:stage}
-    TODOS_CREATED_AT_INDEX: CreatedAtIndex
-    ATTACHMENT_S3_BUCKET: serverless-c4-todo-images-${sls:stage}
-    SIGNED_URL_EXPIRATION: 300
+    TODOS_TABLE: ${env:TODOS_TABLE, 'Todos-dev'}
+    TODOS_CREATED_AT_INDEX: ${env:TODOS_CREATED_AT_INDEX, 'CreatedAtIndex'}
+    ATTACHMENT_S3_BUCKET: ${env:ATTACHMENT_S3_BUCKET, 'serverless-c4-todo-images-dev'}
+    SIGNED_URL_EXPIRATION: ${env:SIGNED_URL_EXPIRATION, '300'}
 
   logs:
     # Enable API Gateway logs
@@ -88,7 +88,7 @@ functions:
       - Effect: Allow
         Action:
           - dynamodb:Query
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_CREATED_AT_INDEX}
+        Resource: arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_CREATED_AT_INDEX}
 
   # TODO: Configure this function - 
   # Provide iamRoleStatements property. Decide the Actions and AWS Resource. 
@@ -112,7 +112,7 @@ functions:
       - Effect: Allow
         Action:
           - dynamodb:PutItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+        Resource: arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   # TODO: Configure this function
   # Provide property for setting up CORS, Authorizer, iamRoleStatements, and request schemas
@@ -131,7 +131,7 @@ functions:
       - Effect: Allow
         Action:
           - dynamodb:PutItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+        Resource: arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   # TODO: Configure this function
   # Provide property for setting up CORS, Authorizer, iamRoleStatements
@@ -150,7 +150,7 @@ functions:
       - Effect: Allow
         Action:
           - dynamodb:DeleteItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+        Resource: arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   # TODO: Configure this function
   # Provide property for setting up CORS, Authorizer, iamRoleStatements
@@ -256,6 +256,7 @@ resources:
             - Sid: PublicReadForGetBucketObjects
               Effect: Allow
               Principal: '*'
+              # TODO: confirm s3:* ????
               Action: 's3:GetObject'
               Resource: 'arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*'
         Bucket: !Ref AttachmentsBucket

@@ -3,22 +3,35 @@ import 'reflect-metadata'
 import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import * as middy from 'middy'
-import { cors } from 'middy/middlewares'
+import middy from '@middy/core'
+import httpErrorHandler from '@middy/http-error-handler'
+import errorLogger from '@middy/error-logger'
+import cors from '@middy/http-cors'
 
-import { getTodosForUser as getTodosForUser } from '../../businessLogic/todos'
+import { getTodoItems } from '../../helpers/todos'
 import { getUserId } from '../utils';
 
 // TODO: Get all TODO items for a current user
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     // Write your code here
-    const todos = '...'
+    const userId = getUserId(event)
+    
+    const todos = await getTodoItems(userId)
 
-    return undefined
+    return {
+      statusCode: 201,
+      body: JSON.stringify({
+        items: todos
+      })
+    }
+})
 
-handler.use(
-  cors({
-    credentials: true
-  })
-)
+handler
+  .use(httpErrorHandler())
+  .use(
+    cors({
+      credentials: true
+    })
+  )
+  .use(errorLogger())

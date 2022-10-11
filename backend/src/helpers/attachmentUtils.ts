@@ -1,10 +1,12 @@
-import * as AWS from 'aws-sdk'
+// import * as AWS from 'aws-sdk'
 import * as AWSXRay from 'aws-xray-sdk'
 
-const XAWS = AWSXRay.captureAWS(AWS)
+// const XAWS = AWSXRay.captureAWS(AWS)
 
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
+import { createLogger } from '../utils/logger'
 
 // Set the AWS Region.
 // https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_s3_code_examples.html
@@ -12,16 +14,22 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 const XS3Client = AWSXRay.captureAWSClient(S3Client)
 const s3Client = new XS3Client({});
 
+const logger = createLogger('attachmentUtils')
+
 // TODO: Implement the fileStogare logic
-const s3 = new XAWS.S3({
-  signatureVersion: 'v4'
-})
+// const s3 = new XAWS.S3({
+//   signatureVersion: 'v4'
+// })
 
 // const todosTableName = process.env.TODOS_TABLE || 'Todos-dev'
 const bucketName = process.env.ATTACHMENT_S3_BUCKET
 const urlExpiration = process.env.SIGNED_URL_EXPIRATION || '300'
 
-export async function getUploadUrl(todoId: string) {
+export async function createAttachmentPresignedUrl(todoId: string) {
+  logger.info(`AWS_REGION: "${process.env.AWS_REGION}"`)
+  logger.info(`ATTACHMENT_S3_BUCKET: "${process.env.ATTACHMENT_S3_BUCKET}"`)
+  logger.info(`SIGNED_URL_EXPIRATION: "${process.env.SIGNED_URL_EXPIRATION}"`)
+
   // Set parameters
   // Create a random name for the Amazon Simple Storage Service (Amazon S3) bucket and key
   const bucketParams = {
@@ -30,9 +38,9 @@ export async function getUploadUrl(todoId: string) {
   };
 
   // Create a command to put the object in the S3 bucket.
-  const command = new PutObjectCommand(bucketParams);
+  const putCommand = new PutObjectCommand(bucketParams);
   // Create the presigned URL.
-  const signedUrl = await getSignedUrl(s3Client, command, {
+  const signedUrl = await getSignedUrl(s3Client, putCommand, {
     expiresIn: parseInt(urlExpiration, 10),
   });
 

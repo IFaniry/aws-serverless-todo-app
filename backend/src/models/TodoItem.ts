@@ -60,7 +60,7 @@ export const todosTable = new Table({
   },
 })
 export class TodoEntity {
-  @AutoGenerateAttribute()
+  @Attribute()
   userId!: string
 
   @AutoGenerateAttribute({

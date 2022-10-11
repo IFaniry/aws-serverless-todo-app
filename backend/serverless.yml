@@ -75,6 +75,9 @@ functions:
   # Provide iamRoleStatements property for performing Actions on DynamoDB
   GetTodos:
     handler: src/lambda/http/getTodos.handler
+    # TODO: for all functions here
+    environment:
+      API_KEY: MY_SECRET_API_KEY
     events:
       - http:
           method: get
@@ -169,6 +172,14 @@ functions:
         Action:
           - s3:PutObject
         Resource: "arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*"
+
+  
+  users:
+    handler: src/lambda/http/updateAttachmentUrl.handler
+    events:
+      - s3:
+          bucket: ${self:provider.environment.ATTACHMENT_S3_BUCKET}
+          event: s3:ObjectCreated:*
 
 resources:
   Resources:

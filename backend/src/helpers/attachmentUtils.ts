@@ -3,7 +3,7 @@ import * as AWSXRay from 'aws-xray-sdk'
 
 // const XAWS = AWSXRay.captureAWS(AWS)
 
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, PutObjectCommandInput, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { createLogger } from '../utils/logger'
@@ -25,16 +25,27 @@ const logger = createLogger('attachmentUtils')
 const bucketName = process.env.ATTACHMENT_S3_BUCKET
 const urlExpiration = process.env.SIGNED_URL_EXPIRATION || '300'
 
+// import { HeadObjectCommandOutput } from "@aws-sdk/client-s3";
+// const r: HeadObjectCommandOutput
+// r.Metadata
+
 export async function createAttachmentPresignedUrl(todoId: string) {
   logger.info(`AWS_REGION: "${process.env.AWS_REGION}"`)
   logger.info(`ATTACHMENT_S3_BUCKET: "${process.env.ATTACHMENT_S3_BUCKET}"`)
   logger.info(`SIGNED_URL_EXPIRATION: "${process.env.SIGNED_URL_EXPIRATION}"`)
 
+  // TODO: if object does not exist then add metadata
+  // https://stackoverflow.com/a/32646827
+  
   // Set parameters
   // Create a random name for the Amazon Simple Storage Service (Amazon S3) bucket and key
-  const bucketParams = {
+  const bucketParams: PutObjectCommandInput = {
     Bucket: bucketName,
     Key: todoId,
+    Metadata: {
+      todoId
+      // TODO: add userId and interface for this CustomMetadata
+    }
   };
 
   // Create a command to put the object in the S3 bucket.
@@ -54,4 +65,18 @@ export async function createAttachmentPresignedUrl(todoId: string) {
   //   Key: nanoid(),
   //   Expires: urlExpiration
   // })
+}
+
+export async function getMetadata() {
+  // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/classes/headobjectcommand.html
+  const bucketParams: HeadObjectCommandInput = {
+    Bucket: bucketName,
+    Key: todoId,
+  };
+
+  // Create a command to put the object in the S3 bucket.
+  const headCommand = new HeadObjectCommand(bucketParams)
+
+  const response = await s3Client.send(headCommand)
+  response.Metadata
 }

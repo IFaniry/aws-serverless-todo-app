@@ -1,3 +1,5 @@
+// https://github.com/typedorm/typedorm#installation
+import 'reflect-metadata'
 import * as dotenv from 'dotenv'
 import {
   Table,
@@ -34,7 +36,7 @@ export const todoItemSchema = z.object({
 
 // Todos typedorm Table
 export const todosTable = new Table({
-  name: process.env.TODOS_TABLE || 'Todos-dev',
+  name: process.env.TODOS_TABLE || 'tahina-todos-dev',
   partitionKey: 'userId',
   sortKey: 'todoId',
   indexes: {

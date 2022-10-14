@@ -22,7 +22,7 @@ const logger = createLogger('attachmentUtils')
 //   signatureVersion: 'v4'
 // })
 
-// const todosTableName = process.env.TODOS_TABLE || 'Todos-dev'
+// const todosTableName = process.env.TODOS_TABLE || 'tahina-todos-dev'
 const bucketName = process.env.ATTACHMENT_S3_BUCKET
 const urlExpiration = process.env.SIGNED_URL_EXPIRATION || '300'
 

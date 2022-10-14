@@ -1,5 +1,3 @@
-// https://github.com/typedorm/typedorm#installation
-import 'reflect-metadata'
 import 'source-map-support/register'
 
 import { APIGatewayProxyResult, S3CreateEvent } from 'aws-lambda'
@@ -17,7 +15,7 @@ export const handler = middy(
   async (event: S3CreateEvent): Promise<APIGatewayProxyResult> => {
     logger.info(`AWS_REGION: "${process.env.AWS_REGION}"`)
     logger.info(`ATTACHMENT_S3_BUCKET: "${process.env.ATTACHMENT_S3_BUCKET}"`)
-    
+
     for (const record of event.Records) {
       logger.info(`Processing: "${record.s3.object.key}" S3 Object`)
 

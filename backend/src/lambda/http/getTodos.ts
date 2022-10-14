@@ -1,5 +1,3 @@
-// https://github.com/typedorm/typedorm#installation
-import 'reflect-metadata'
 import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'

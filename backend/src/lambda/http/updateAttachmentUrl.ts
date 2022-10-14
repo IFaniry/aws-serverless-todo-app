@@ -2,25 +2,36 @@
 import 'reflect-metadata'
 import 'source-map-support/register'
 
-import { APIGatewayProxyEvent, APIGatewayProxyResult, S3CreateEvent } from 'aws-lambda'
+import { APIGatewayProxyResult, S3CreateEvent } from 'aws-lambda'
 import middy from '@middy/core'
 import httpErrorHandler from '@middy/http-error-handler'
 import errorLogger from '@middy/error-logger'
-import cors from '@middy/http-cors'
-import * as createError from 'http-errors'
+// import cors from '@middy/http-cors'
 
-import { updateTodoItem } from '../../helpers/todos'
-import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
-import { getUserId } from '../utils'
+import { createLogger } from '../../utils/logger'
+import { updateTodoAttachmentUrl } from '../../helpers/todos'
+
+const logger = createLogger('AttachmentUrlUpdate')
 
 export const handler = middy(
   async (event: S3CreateEvent): Promise<APIGatewayProxyResult> => {
+    logger.info(`AWS_REGION: "${process.env.AWS_REGION}"`)
+    logger.info(`ATTACHMENT_S3_BUCKET: "${process.env.ATTACHMENT_S3_BUCKET}"`)
+    
     for (const record of event.Records) {
-      const todoId = record.s3.object.key
-      // TODO: get metadata
+      logger.info(`Processing: "${record.s3.object.key}" S3 Object`)
+
+      const [ todoId, userId ] = record.s3.object.key.split("/")
+      
+      const bucketName = process.env.ATTACHMENT_S3_BUCKET
+      const regionCode = process.env.AWS_REGION
+
+      // https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-bucket-intro.html
+      const attachmentUrl = `https://${bucketName}.s3.${regionCode}.amazonaws.com/${userId}/${todoId}`
+
+      // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
+      await updateTodoAttachmentUrl({ userId, todoId }, attachmentUrl)
     }
-    // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
-    await updateTodoItem({ userId, todoId }, updatedTodo)
 
     return {
       statusCode: 200,
@@ -30,9 +41,9 @@ export const handler = middy(
 
 handler
   .use(httpErrorHandler())
-  .use(
-    cors({
-      credentials: true
-    })
-  )
+  // .use(
+  //   cors({
+  //     credentials: true
+  //   })
+  // )
   .use(errorLogger())

@@ -106,6 +106,50 @@ export async function updateTodoItem(
   )
 }
 
+export async function updateTodoAttachmentUrl(
+  { userId, todoId }: { userId: string; todoId: string; },
+  attachmentUrl: string
+) {
+  const userIdSchema = z.string({
+    required_error: 'userId is required',
+    invalid_type_error: 'userId must be a string',
+  })
+  const todoIdSchema = z.string({
+    required_error: 'todoId is required',
+    invalid_type_error: 'todoId must be a string',
+  })
+  const attachmentUrlSchema = z.string({
+    required_error: 'attachmentUrl is required',
+    invalid_type_error: 'attachmentUrl must be a string',
+  })
+
+  // Todo Update Payload Validation
+  try {
+    userIdSchema.parse(userId)
+    todoIdSchema.parse(todoId)
+    todoIdSchema.parse(attachmentUrlSchema)
+  } catch(error) {
+    // throw back error as 422 HTTP error
+    // https://middy.js.org/docs/middlewares/http-error-handler/
+    // https://github.com/jshttp/http-errors#new-createerrorcode--namemsg
+    if (error instanceof ZodError) {
+      throw new createError.UnprocessableEntity(
+        fromZodError(error).message
+      )
+    }
+  }
+
+  const entityManager = getEntityManager()
+
+  logger.info('Updating a Todo attachmentUrl with payload:', { attachmentUrl })
+
+  await entityManager.update(
+    TodoEntity,
+    { userId, todoId },
+    { attachmentUrl }
+  )
+}
+
 export async function deleteTodoItem(
   { userId, todoId }: { userId: string; todoId: string; }
 ) {

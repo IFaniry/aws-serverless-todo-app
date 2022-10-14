@@ -19,12 +19,12 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
 
-  iamRoleStatements:
-    - Effect: "Allow"
-      Action:
-        - xray:PutTelemetryRecords
-        - xray:PutTraceSegments
-      Resource: "*"
+  # iamRoleStatements:
+  #   - Effect: "Allow"
+  #     Action:
+  #       - xray:PutTelemetryRecords
+  #       - xray:PutTraceSegments
+  #     Resource: "*"
 
   tracing:
     lambda: true
@@ -43,6 +43,7 @@ provider:
     # Enable API Gateway logs
     restApi: true
 
+  # https://www.npmjs.com/package/serverless-iam-roles-per-function
   iam:
     role:
       statements:
@@ -76,8 +77,8 @@ functions:
   GetTodos:
     handler: src/lambda/http/getTodos.handler
     # TODO: for all functions here
-    environment:
-      API_KEY: MY_SECRET_API_KEY
+    # environment:
+    #   API_KEY: ${self:provider.environment.TODOS_TABLE}
     events:
       - http:
           method: get
@@ -180,6 +181,15 @@ functions:
       - s3:
           bucket: ${self:provider.environment.ATTACHMENT_S3_BUCKET}
           event: s3:ObjectCreated:*
+    # https://www.serverless.com/blog/aws-lambda-provisioned-concurrency
+    provisionedConcurrency: 5
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:GetObject
+          # - s3:GetObjectVersion
+          # - s3:ListBucket
+        Resource: "arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*"
 
 resources:
   Resources:
@@ -192,7 +202,7 @@ resources:
         ResponseParameters:
           gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
           gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST,PATCH,DELETE'"
         ResponseType: DEFAULT_4XX
     #     RestApiId:
     #       Ref: ApiGatewayRestApi

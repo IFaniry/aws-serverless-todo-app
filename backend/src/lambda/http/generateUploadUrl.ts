@@ -8,6 +8,7 @@ import cors from '@middy/http-cors'
 import * as createError from 'http-errors'
 
 import { createAttachmentPresignedUrl } from '../../helpers/attachmentUtils'
+import { getUserId } from '../utils'
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -15,9 +16,10 @@ export const handler = middy(
       throw new createError.UnprocessableEntity('Missing route parameter')
     }
 
+    const userId = getUserId(event)
     const todoId = event.pathParameters.todoId
     // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
-    const uploadUrl = await createAttachmentPresignedUrl(todoId)
+    const uploadUrl = await createAttachmentPresignedUrl(todoId, userId)
 
     return {
       statusCode: 200,

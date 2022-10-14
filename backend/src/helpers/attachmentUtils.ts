@@ -3,7 +3,8 @@ import * as AWSXRay from 'aws-xray-sdk'
 
 // const XAWS = AWSXRay.captureAWS(AWS)
 
-import { S3Client, PutObjectCommand, PutObjectCommandInput, HeadObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/client-s3";
+// import { HeadObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { createLogger } from '../utils/logger'
@@ -29,7 +30,7 @@ const urlExpiration = process.env.SIGNED_URL_EXPIRATION || '300'
 // const r: HeadObjectCommandOutput
 // r.Metadata
 
-export async function createAttachmentPresignedUrl(todoId: string) {
+export async function createAttachmentPresignedUrl(todoId: string, userId: string) {
   logger.info(`AWS_REGION: "${process.env.AWS_REGION}"`)
   logger.info(`ATTACHMENT_S3_BUCKET: "${process.env.ATTACHMENT_S3_BUCKET}"`)
   logger.info(`SIGNED_URL_EXPIRATION: "${process.env.SIGNED_URL_EXPIRATION}"`)
@@ -41,11 +42,11 @@ export async function createAttachmentPresignedUrl(todoId: string) {
   // Create a random name for the Amazon Simple Storage Service (Amazon S3) bucket and key
   const bucketParams: PutObjectCommandInput = {
     Bucket: bucketName,
-    Key: todoId,
-    Metadata: {
-      todoId
-      // TODO: add userId and interface for this CustomMetadata
-    }
+    Key: `${userId}/${todoId}`,
+    // Metadata: {
+    //   todoId
+    //   // TODO: add userId and interface for this CustomMetadata
+    // }
   };
 
   // Create a command to put the object in the S3 bucket.
@@ -67,16 +68,16 @@ export async function createAttachmentPresignedUrl(todoId: string) {
   // })
 }
 
-export async function getMetadata() {
-  // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/classes/headobjectcommand.html
-  const bucketParams: HeadObjectCommandInput = {
-    Bucket: bucketName,
-    Key: todoId,
-  };
+// export async function getMetadata() {
+//   // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/classes/headobjectcommand.html
+//   const bucketParams: HeadObjectCommandInput = {
+//     Bucket: bucketName,
+//     Key: todoId,
+//   };
 
-  // Create a command to put the object in the S3 bucket.
-  const headCommand = new HeadObjectCommand(bucketParams)
+//   // Create a command to put the object in the S3 bucket.
+//   const headCommand = new HeadObjectCommand(bucketParams)
 
-  const response = await s3Client.send(headCommand)
-  response.Metadata
-}
+//   const response = await s3Client.send(headCommand)
+//   response.Metadata
+// }

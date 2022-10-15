@@ -34,13 +34,15 @@ export const todoItemSchema = z.object({
   attachmentUrl: z.string().optional(),
 })
 
+const createdAtIndex = process.env.TODOS_CREATED_AT_INDEX || 'CreatedAtIndex'
+
 // Todos typedorm Table
 export const todosTable = new Table({
   name: process.env.TODOS_TABLE || 'tahina-todos-dev',
   partitionKey: 'userId',
   sortKey: 'todoId',
   indexes: {
-    createdAtLSI: {
+    [createdAtIndex]: {
       type: INDEX_TYPE.LSI,
       sortKey: 'createdAt',
     },
@@ -55,7 +57,7 @@ export const todosTable = new Table({
     sortKey: 'TODO#{{todoId}}',
   },
   indexes: {
-    createdAtLSI: {
+    [createdAtIndex]: {
       sortKey: 'TODOS#CREATED_AT#{{createdAt}}',
       type: INDEX_TYPE.LSI,
     },

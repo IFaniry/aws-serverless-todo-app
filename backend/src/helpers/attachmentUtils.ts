@@ -1,9 +1,11 @@
 // import * as AWS from 'aws-sdk'
+// import * as AWSXRay from 'aws-xray-sdk'
+// import { XRayClient } from "@aws-sdk/client-xray"
 import * as AWSXRay from 'aws-xray-sdk'
 
 // const XAWS = AWSXRay.captureAWS(AWS)
 
-import { S3Client, PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/client-s3";
+import { S3, PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/client-s3";
 // import { HeadObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
@@ -11,9 +13,11 @@ import { createLogger } from '../utils/logger'
 
 // Set the AWS Region.
 // https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_s3_code_examples.html
+// https://www.npmjs.com/package/aws-xray-sdk-core
 // Create an Amazon S3 service client object.
-const XS3Client = AWSXRay.captureAWSClient(S3Client)
-const s3Client = new XS3Client({});
+const s3 = new S3({})
+const s3Client = AWSXRay.captureAWSv3Client(s3)
+// const s3Client = new XS3Client({})
 
 const logger = createLogger('attachmentUtils')
 

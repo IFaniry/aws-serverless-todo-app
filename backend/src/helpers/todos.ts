@@ -22,8 +22,14 @@ const logger = createLogger('TodosAccess')
 
 export async function getTodoItems(userId: string): Promise<TodoEntity[]> {
   const entityManager = getEntityManager()
+  
+  const createdAtIndex = process.env.TODOS_CREATED_AT_INDEX || 'CreatedAtIndex'
 
-  const { items: todoItems } = await entityManager.find(TodoEntity, { userId })
+  const { items: todoItems } = await entityManager.find(
+    TodoEntity,
+    { userId },
+    { queryIndex: createdAtIndex },
+  )
 
   return todoItems
 }

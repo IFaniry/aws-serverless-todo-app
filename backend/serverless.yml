@@ -64,20 +64,25 @@ custom:
     includeModules:
       forceExclude:
         - aws-sdk
-
+  # https://www.serverless.com/plugins/serverless-iam-roles-per-function
   serverless-iam-roles-per-function:
     defaultInherit: true
 
 functions:
-
   Auth:
+    name: tahina-todo-auth-${sls:stage}
     handler: src/lambda/auth/auth0Authorizer.handler
     # https://www.serverless.com/blog/aws-lambda-provisioned-concurrency
     provisionedConcurrency: 5
+    # https://www.serverless.com/plugins/serverless-iam-roles-per-function
+    iamRoleStatementsInherit: true
+    # https://www.serverless.com/plugins/serverless-plugin-tracing
+    tracing: true
 
   # TODO: Configure this function - 
   # Provide iamRoleStatements property for performing Actions on DynamoDB
   GetTodos:
+    name: tahina-todo-list-${sls:stage}
     handler: src/lambda/http/getTodos.handler
     # TODO: for all functions here
     # environment:
@@ -90,6 +95,10 @@ functions:
           authorizer: Auth
     # https://www.serverless.com/blog/aws-lambda-provisioned-concurrency
     provisionedConcurrency: 5
+    # https://www.serverless.com/plugins/serverless-iam-roles-per-function
+    iamRoleStatementsInherit: true
+    # https://www.serverless.com/plugins/serverless-plugin-tracing
+    tracing: true
     # https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_dynamodb_specific-table.html
     iamRoleStatements:
       - Effect: Allow
@@ -102,6 +111,7 @@ functions:
   # To refer to an AWS resource defined in the "Resources" section, you can use "Resource: !GetAtt <resource-name>.Arn"
   # To validate incoming HTTP requests, we have provided the request schemas in function definition below. 
   CreateTodo:
+    name: tahina-todo-create-${sls:stage}
     handler: src/lambda/http/createTodo.handler
     events:
       - http:
@@ -114,6 +124,10 @@ functions:
               application/json: ${file(models/create-todo-model.json)}
     # https://www.serverless.com/blog/aws-lambda-provisioned-concurrency
     provisionedConcurrency: 5
+    # https://www.serverless.com/plugins/serverless-iam-roles-per-function
+    iamRoleStatementsInherit: true
+    # https://www.serverless.com/plugins/serverless-plugin-tracing
+    tracing: true
     # https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_dynamodb_specific-table.html
     iamRoleStatements:
       - Effect: Allow
@@ -124,6 +138,7 @@ functions:
   # TODO: Configure this function
   # Provide property for setting up CORS, Authorizer, iamRoleStatements, and request schemas
   UpdateTodo:
+    name: tahina-todo-update-${sls:stage}
     handler: src/lambda/http/updateTodo.handler
     events:
       - http:
@@ -133,6 +148,10 @@ functions:
           authorizer: Auth
     # https://www.serverless.com/blog/aws-lambda-provisioned-concurrency
     provisionedConcurrency: 5
+    # https://www.serverless.com/plugins/serverless-iam-roles-per-function
+    iamRoleStatementsInherit: true
+    # https://www.serverless.com/plugins/serverless-plugin-tracing
+    tracing: true
     # https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_dynamodb_specific-table.html
     iamRoleStatements:
       - Effect: Allow
@@ -143,6 +162,7 @@ functions:
   # TODO: Configure this function
   # Provide property for setting up CORS, Authorizer, iamRoleStatements
   DeleteTodo:
+    name: tahina-todo-delete-${sls:stage}
     handler: src/lambda/http/deleteTodo.handler
     events:
       - http:
@@ -152,6 +172,10 @@ functions:
           authorizer: Auth
     # https://www.serverless.com/blog/aws-lambda-provisioned-concurrency
     provisionedConcurrency: 5
+    # https://www.serverless.com/plugins/serverless-iam-roles-per-function
+    iamRoleStatementsInherit: true
+    # https://www.serverless.com/plugins/serverless-plugin-tracing
+    tracing: true
     # https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_dynamodb_specific-table.html
     iamRoleStatements:
       - Effect: Allow
@@ -162,6 +186,7 @@ functions:
   # TODO: Configure this function
   # Provide property for setting up CORS, Authorizer, iamRoleStatements
   GenerateUploadUrl:
+    name: tahina-todo-generateUploadUrl-${sls:stage}
     handler: src/lambda/http/generateUploadUrl.handler
     events:
       - http:
@@ -171,6 +196,10 @@ functions:
           authorizer: Auth
     # https://www.serverless.com/blog/aws-lambda-provisioned-concurrency
     provisionedConcurrency: 5
+    # https://www.serverless.com/plugins/serverless-iam-roles-per-function
+    iamRoleStatementsInherit: true
+    # https://www.serverless.com/plugins/serverless-plugin-tracing
+    tracing: true
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -178,14 +207,21 @@ functions:
         Resource: "arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*"
 
   
-  users:
+  UpdateAttachmentUrl:
+    name: tahina-todo-updateAttachmentUrl-${sls:stage}
     handler: src/lambda/http/updateAttachmentUrl.handler
     events:
       - s3:
           bucket: ${self:provider.environment.ATTACHMENT_S3_BUCKET}
           event: s3:ObjectCreated:*
+          # https://www.serverless.com/framework/docs/providers/aws/events/s3/
+          existing: true
     # https://www.serverless.com/blog/aws-lambda-provisioned-concurrency
     provisionedConcurrency: 5
+    # https://www.serverless.com/plugins/serverless-iam-roles-per-function
+    iamRoleStatementsInherit: true
+    # https://www.serverless.com/plugins/serverless-plugin-tracing
+    tracing: true
     iamRoleStatements:
       - Effect: Allow
         Action:

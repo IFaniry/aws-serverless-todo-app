@@ -1,7 +1,7 @@
 import dateFormat from 'dateformat'
 import { History } from 'history'
 import update from 'immutability-helper'
-import * as React from 'react'
+import React from 'react'
 import {
   Button,
   Checkbox,
@@ -159,7 +159,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
   renderTodosList() {
     return (
       <Grid padded>
-        {this.state.todos.map((todo, pos) => {
+        {this.state.todos.length ? this.state.todos.map((todo, pos) => {
           return (
             <Grid.Row key={todo.todoId}>
               <Grid.Column width={1} verticalAlign="middle">
@@ -200,7 +200,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
               </Grid.Column>
             </Grid.Row>
           )
-        })}
+        }) : null}
       </Grid>
     )
   }

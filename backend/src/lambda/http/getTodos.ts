@@ -8,6 +8,9 @@ import cors from '@middy/http-cors'
 
 import { getTodoItems } from '../../helpers/todos'
 import { getUserId } from '../utils';
+import { createDbConnection } from '../../helpers/todosAccess'
+
+createDbConnection()
 
 // TODO: Get all TODO items for a current user
 export const handler = middy(

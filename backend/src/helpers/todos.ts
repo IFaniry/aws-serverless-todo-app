@@ -7,11 +7,14 @@ import { z } from 'zod'
 import * as createError from 'http-errors'
 import { fromZodError } from 'zod-validation-error'
 import { ZodError } from 'zod'
+import { getEntityManager } from '@typedorm/core'
+import { QUERY_ORDER } from '@typedorm/common'
+
 import { createLogger } from '../utils/logger'
 import { TodoEntity, todoItemSchema } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
-import { getEntityManager } from './todosAccess'
+import { createdAtLSI } from '../models/TodoItem'
 
 const logger = createLogger('TodosAccess')
 
@@ -22,19 +25,20 @@ const logger = createLogger('TodosAccess')
 
 export async function getTodoItems(userId: string): Promise<TodoEntity[]> {
   const entityManager = getEntityManager()
-  
-  const createdAtIndex = process.env.TODOS_CREATED_AT_INDEX || 'CreatedAtIndex'
 
   const { items: todoItems } = await entityManager.find(
     TodoEntity,
     { userId },
-    { queryIndex: createdAtIndex },
+    {
+      queryIndex: createdAtLSI,
+      orderBy: QUERY_ORDER.DESC,
+    },
   )
 
   return todoItems
 }
 
-export async function createTodoItem(payload: CreateTodoRequest) {
+export async function createTodoItem(userId: string, payload: CreateTodoRequest) {
   const todoItemCreationSchema = todoItemSchema.pick({
     name: true,
     dueDate: true,
@@ -58,6 +62,7 @@ export async function createTodoItem(payload: CreateTodoRequest) {
   const todoItem = new TodoEntity()
   todoItem.name = name
   todoItem.dueDate = dueDate
+  todoItem.userId = userId
 
   logger.info(`Creating a Todo named: ${name} and due on ${dueDate}`)
 

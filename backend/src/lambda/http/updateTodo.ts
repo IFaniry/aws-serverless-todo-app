@@ -10,6 +10,9 @@ import * as createError from 'http-errors'
 import { updateTodoItem } from '../../helpers/todos'
 import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
 import { getUserId } from '../utils'
+import { createDbConnection } from '../../helpers/todosAccess'
+
+createDbConnection()
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {

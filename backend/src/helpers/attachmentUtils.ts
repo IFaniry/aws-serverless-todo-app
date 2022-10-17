@@ -8,6 +8,9 @@ import * as AWSXRay from 'aws-xray-sdk'
 import { S3, PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/client-s3";
 // import { HeadObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { getEntityManager } from '@typedorm/core'
+import { TodoEntity } from '../models/TodoItem'
+import * as nanoid from 'nanoid'
 
 import { createLogger } from '../utils/logger'
 
@@ -70,6 +73,25 @@ export async function createAttachmentPresignedUrl(todoId: string, userId: strin
   //   Key: nanoid(),
   //   Expires: urlExpiration
   // })
+}
+
+export async function getAttachmentUrl({ userId, todoId }: { userId: string; todoId: string; }) {
+  logger.info(`AWS_REGION: "${process.env.AWS_REGION}"`)
+  logger.info(`ATTACHMENT_S3_BUCKET: "${process.env.ATTACHMENT_S3_BUCKET}"`)
+
+  const bucketName = process.env.ATTACHMENT_S3_BUCKET
+  const regionCode = process.env.AWS_REGION
+
+  const entityManager = getEntityManager()
+
+  const todoItem = await entityManager.findOne(
+    TodoEntity,
+    { userId, todoId },
+    { select: ['attachmentUrl'] }
+  )
+
+  // https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-bucket-intro.html
+  return `https://${bucketName}.s3.${regionCode}.amazonaws.com/${todoItem?.attachmentUrl || nanoid.nanoid()}`
 }
 
 // export async function getMetadata() {

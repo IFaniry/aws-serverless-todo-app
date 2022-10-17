@@ -34,7 +34,7 @@ export const todoItemSchema = z.object({
   attachmentUrl: z.string().optional(),
 })
 
-const createdAtIndex = process.env.TODOS_CREATED_AT_INDEX || 'CreatedAtIndex'
+export const createdAtLSI = process.env.TODOS_CREATED_AT_INDEX || 'CreatedAtIndex'
 
 // Todos typedorm Table
 export const todosTable = new Table({
@@ -42,7 +42,7 @@ export const todosTable = new Table({
   partitionKey: 'userId',
   sortKey: 'todoId',
   indexes: {
-    [createdAtIndex]: {
+    [createdAtLSI]: {
       type: INDEX_TYPE.LSI,
       sortKey: 'createdAt',
     },
@@ -53,12 +53,12 @@ export const todosTable = new Table({
 @Entity({
   name: 'todo',
   primaryKey: {
-    partitionKey: 'TODO#BY#{{userId}}',
-    sortKey: 'TODO#{{todoId}}',
+    partitionKey: 'TODO-BY-{{userId}}',
+    sortKey: 'TODO-{{todoId}}',
   },
   indexes: {
-    [createdAtIndex]: {
-      sortKey: 'TODOS#CREATED_AT#{{createdAt}}',
+    [createdAtLSI]: {
+      sortKey: 'TODOS-CREATED_AT-{{createdAt}}',
       type: INDEX_TYPE.LSI,
     },
   },

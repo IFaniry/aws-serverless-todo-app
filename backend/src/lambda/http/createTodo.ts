@@ -6,16 +6,21 @@ import httpErrorHandler from '@middy/http-error-handler'
 import errorLogger from '@middy/error-logger'
 import cors from '@middy/http-cors'
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
-// import { getUserId } from '../utils';
+import { getUserId } from '../utils';
 // import { createTodo } from '../../businessLogic/todos'
 import { createTodoItem } from '../../helpers/todos'
+import { createDbConnection } from '../../helpers/todosAccess'
+
+createDbConnection()
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const newTodo: CreateTodoRequest = JSON.parse(event.body as string)
     // TODO: Implement creating a new TODO item
 
-    await createTodoItem(newTodo)
+    const userId = getUserId(event)
+
+    await createTodoItem(userId, newTodo)
     
     return {
       statusCode: 201,

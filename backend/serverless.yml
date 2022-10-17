@@ -119,9 +119,9 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
-          request:
-            schemas:
-              application/json: ${file(models/create-todo-model.json)}
+          # request:
+          #   schemas:
+          #     application/json: ${file(models/create-todo-model.json)}
     # https://www.serverless.com/blog/aws-lambda-provisioned-concurrency
     provisionedConcurrency: 5
     # https://www.serverless.com/plugins/serverless-iam-roles-per-function
@@ -156,7 +156,7 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - dynamodb:PutItem
+          - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   # TODO: Configure this function
@@ -205,30 +205,35 @@ functions:
         Action:
           - s3:PutObject
         Resource: "arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*"
-
-  
-  UpdateAttachmentUrl:
-    name: tahina-todo-updateAttachmentUrl-${sls:stage}
-    handler: src/lambda/http/updateAttachmentUrl.handler
-    events:
-      - s3:
-          bucket: ${self:provider.environment.ATTACHMENT_S3_BUCKET}
-          event: s3:ObjectCreated:*
-          # https://www.serverless.com/framework/docs/providers/aws/events/s3/
-          existing: true
-    # https://www.serverless.com/blog/aws-lambda-provisioned-concurrency
-    provisionedConcurrency: 5
-    # https://www.serverless.com/plugins/serverless-iam-roles-per-function
-    iamRoleStatementsInherit: true
-    # https://www.serverless.com/plugins/serverless-plugin-tracing
-    tracing: true
-    iamRoleStatements:
       - Effect: Allow
         Action:
-          - s3:GetObject
-          # - s3:GetObjectVersion
-          # - s3:ListBucket
-        Resource: "arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*"
+          - dynamodb:UpdateItem
+          - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.TODOS_TABLE}
+
+  
+  # UpdateAttachmentUrl:
+  #   name: tahina-todo-updateAttachmentUrl-${sls:stage}
+  #   handler: src/lambda/http/updateAttachmentUrl.handler
+  #   events:
+  #     - s3:
+  #         bucket: ${self:provider.environment.ATTACHMENT_S3_BUCKET}
+  #         event: s3:ObjectCreated:*
+  #         # https://www.serverless.com/framework/docs/providers/aws/events/s3/
+  #         existing: true
+  #   # https://www.serverless.com/blog/aws-lambda-provisioned-concurrency
+  #   provisionedConcurrency: 5
+  #   # https://www.serverless.com/plugins/serverless-iam-roles-per-function
+  #   iamRoleStatementsInherit: true
+  #   # https://www.serverless.com/plugins/serverless-plugin-tracing
+  #   tracing: true
+  #   iamRoleStatements:
+  #     - Effect: Allow
+  #       Action:
+  #         - s3:GetObject
+  #         # - s3:GetObjectVersion
+  #         # - s3:ListBucket
+  #       Resource: "arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*"
 
 resources:
   Resources:

@@ -8,7 +8,13 @@ import { DocumentClientV3 } from '@typedorm/document-client'
 import { DynamoDB } from '@aws-sdk/client-dynamodb'
 // import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 
-import { createConnection, getEntityManager as getTypedormEntityManager } from '@typedorm/core'
+import {
+  createConnection,
+  // getEntityManager as getTypedormEntityManager,
+  // ConnectionManager,
+  // getConnection,
+  // Connection,
+} from '@typedorm/core'
 
 import { createLogger } from '../utils/logger'
 import { todosTable, TodoEntity } from '../models/TodoItem'
@@ -30,7 +36,8 @@ const documentClient = new DocumentClientV3(XDynamoDBClient)
 // const XDynamoDBClient = AWSXRay.captureAWSClient(DocumentClient)
 // const documentClient = new DocumentClientV2(new XDynamoDBClient({}))
 
-export function getEntityManager() {
+// https://craftsmenltd.com/blog/2022/07/15/improving-cost-and-efficiency-by-using-aws-lambda-cache/
+export function createDbConnection() {
   logger.info(`TODOS_TABLE: "${process.env.TODOS_TABLE}"`)
   logger.info(`TODOS_CREATED_AT_INDEX: "${process.env.TODOS_CREATED_AT_INDEX}"`)
 
@@ -39,8 +46,47 @@ export function getEntityManager() {
     entities: [TodoEntity],
     documentClient,
   })
-
-  const entityManager = getTypedormEntityManager()
-
-  return entityManager
 }
+
+// export function getEntityManager() {
+//   logger.info(`TODOS_TABLE: "${process.env.TODOS_TABLE}"`)
+//   logger.info(`TODOS_CREATED_AT_INDEX: "${process.env.TODOS_CREATED_AT_INDEX}"`)
+
+//   // const g = new ConnectionManager()
+
+//   // const r = getConnection()
+//   // getConnection().isConnected
+//   // r.connect()
+//   // r.entityManager
+
+//   createConnection({
+//     table: todosTable,
+//     entities: [TodoEntity],
+//     documentClient,
+//   })
+
+//   const entityManager = getTypedormEntityManager()
+
+//   return entityManager
+// }
+
+// export class TodosAccess {
+//   // https://stackoverflow.com/a/36978360
+//   private static _entityManager: EntityManager
+
+//   private constructor()
+//   {
+//     logger.info(`TODOS_TABLE: "${process.env.TODOS_TABLE}"`)
+//     logger.info(`TODOS_CREATED_AT_INDEX: "${process.env.TODOS_CREATED_AT_INDEX}"`)
+//   }
+
+//   public static get EntityManager() {
+//     return this._entityManager || (
+//       createConnection({
+//         table: todosTable,
+//         entities: [TodoEntity],
+//         documentClient,
+//       })
+//     )
+//   }
+// }

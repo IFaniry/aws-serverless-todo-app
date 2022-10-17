@@ -7,8 +7,12 @@ import errorLogger from '@middy/error-logger'
 import cors from '@middy/http-cors'
 import * as createError from 'http-errors'
 
-import { createAttachmentPresignedUrl } from '../../helpers/attachmentUtils'
+import { createAttachmentPresignedUrl, getAttachmentUrl } from '../../helpers/attachmentUtils'
+import { updateTodoAttachmentUrl } from '../../helpers/todos'
+import { createDbConnection } from '../../helpers/todosAccess'
 import { getUserId } from '../utils'
+
+createDbConnection()
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -19,7 +23,12 @@ export const handler = middy(
     const userId = getUserId(event)
     const todoId = event.pathParameters.todoId
     // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
-    const uploadUrl = await createAttachmentPresignedUrl(todoId, userId)
+    const [uploadUrl, attachmentUrl] = await Promise.all([
+      createAttachmentPresignedUrl(todoId, userId),
+      getAttachmentUrl({ userId, todoId }),
+    ])
+
+    await updateTodoAttachmentUrl({ userId, todoId }, attachmentUrl)
 
     return {
       statusCode: 200,

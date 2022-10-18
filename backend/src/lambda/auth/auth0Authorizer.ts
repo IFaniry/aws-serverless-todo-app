@@ -1,16 +1,13 @@
+import 'source-map-support/register'
 import { APIGatewayTokenAuthorizerEvent, APIGatewayAuthorizerResult } from 'aws-lambda'
 import { JwksClient, CertSigningKey, RsaSigningKey } from 'jwks-rsa'
-import 'source-map-support/register'
-
 import { JwtHeader, SigningKeyCallback, verify } from 'jsonwebtoken'
+
 import { createLogger } from '../../utils/logger'
-// import Axios from 'axios'
 import { JwtPayload } from '../../auth/JwtPayload'
 
 const logger = createLogger('auth')
 
-// TODO: Provide a URL that can be used to download a certificate that can be used
-// to verify JWT token signature.
 // jwksUri is from Auth0 page -> Show Advanced Settings -> Endpoints -> JSON Web Key Set
 const jwksUri = 'https://dev-y5vfm-dl.us.auth0.com/.well-known/jwks.json'
 // https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorpublickey-options-callback
@@ -90,8 +87,6 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
     })
   }
 
-  // TODO: Implement token verification
-  // You should implement it similarly to how it was implemented for the exercise for the lesson 5
   // https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorpublickey-options-callback
   return jwtVerify(token)
 }

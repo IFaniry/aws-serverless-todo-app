@@ -54,7 +54,7 @@ export const todosTable = new Table({
   name: 'todo',
   primaryKey: {
     partitionKey: 'TODO-BY-{{userId}}',
-    sortKey: 'TODO-{{todoId}}',
+    sortKey: '{{todoId}}',
   },
   indexes: {
     [createdAtLSI]: {

@@ -7,7 +7,7 @@ import errorLogger from '@middy/error-logger'
 import cors from '@middy/http-cors'
 import * as createError from 'http-errors'
 
-import { createAttachmentPresignedUrl, getAttachmentUrl } from '../../helpers/attachmentUtils'
+import { createAttachmentPresignedUrl } from '../../helpers/attachmentUtils'
 import { updateTodoAttachmentUrl } from '../../helpers/todos'
 import { createDbConnection } from '../../helpers/todosAccess'
 import { getUserId } from '../utils'
@@ -22,11 +22,8 @@ export const handler = middy(
 
     const userId = getUserId(event)
     const todoId = event.pathParameters.todoId
-    // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
-    const [uploadUrl, attachmentUrl] = await Promise.all([
-      createAttachmentPresignedUrl(todoId, userId),
-      getAttachmentUrl({ userId, todoId }),
-    ])
+
+    const { attachmentUrl, uploadUrl } = await createAttachmentPresignedUrl(todoId, userId)
 
     await updateTodoAttachmentUrl({ userId, todoId }, attachmentUrl)
 
@@ -41,9 +38,9 @@ export const handler = middy(
 
 handler
   .use(httpErrorHandler())
+  .use(errorLogger())
   .use(
     cors({
       credentials: true
     })
   )
-  .use(errorLogger())

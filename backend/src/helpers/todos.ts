@@ -18,11 +18,6 @@ import { createdAtLSI } from '../models/TodoItem'
 
 const logger = createLogger('TodosAccess')
 
-// TODO: Implement the dataLayer logic
-// https://github.com/typedorm/typedorm#developing-with-typedorm
-// const XDynamoDBClient = AWSXRay.captureAWSClient(DynamoDBClient)
-// const documentClient = new DocumentClientV3(new XDynamoDBClient({}))
-
 export async function getTodoItems(userId: string): Promise<TodoEntity[]> {
   const entityManager = getEntityManager()
 
@@ -134,11 +129,13 @@ export async function updateTodoAttachmentUrl(
     invalid_type_error: 'attachmentUrl must be a string',
   })
 
+logger.info('todoId: ', todoId)
+
   // Todo Update Payload Validation
   try {
     userIdSchema.parse(userId)
     todoIdSchema.parse(todoId)
-    todoIdSchema.parse(attachmentUrlSchema)
+    attachmentUrlSchema.parse(attachmentUrl)
   } catch(error) {
     // throw back error as 422 HTTP error
     // https://middy.js.org/docs/middlewares/http-error-handler/

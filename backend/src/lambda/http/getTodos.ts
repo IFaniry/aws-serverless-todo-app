@@ -12,10 +12,8 @@ import { createDbConnection } from '../../helpers/todosAccess'
 
 createDbConnection()
 
-// TODO: Get all TODO items for a current user
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    // Write your code here
     const userId = getUserId(event)
     
     const todos = await getTodoItems(userId)
@@ -30,9 +28,9 @@ export const handler = middy(
 
 handler
   .use(httpErrorHandler())
+  .use(errorLogger())
   .use(
     cors({
       credentials: true
     })
   )
-  .use(errorLogger())

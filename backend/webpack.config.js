@@ -2,21 +2,15 @@ const path = require('path')
 const slsw = require('serverless-webpack')
 const nodeExternals = require('webpack-node-externals')
 
-// TODO: https://medium.com/@sheepsteak/excluding-the-aws-sdk-from-a-serverless-package-8dcad2f31954
-// TODO: https://github.com/typedorm/typedorm-examples/tree/main/examples/aws-sdk-v3-typescript-webpack
-
 module.exports = {
   mode: slsw.lib.webpack.isLocal ? 'development' : 'production',
   entry: slsw.lib.entries,
   externals: [
     nodeExternals(),
-    // nodeExternals({
-    //   modulesDir: path.resolve(dirName, '../../node_modules'),
-    // }),
   ],
   devtool: 'source-map',
   resolve: {
-    extensions: ['.json', '.ts'],
+    extensions: ['.json', '.ts', '.js'],
   },
   output: {
     libraryTarget: 'commonjs',
@@ -28,18 +22,13 @@ module.exports = {
   module: {
     rules: [
       {
-        // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
         test: /\.(ts?)$/,
         loader: 'ts-loader',
-        // exclude: [
-        //   [
-        //     path.resolve(__dirname, 'node_modules'),
-        //     path.resolve(__dirname, '.serverless'),
-        //     path.resolve(__dirname, '.webpack'),
-        //   ],
-        // ],
       },
     ],
   },
-  // externals: ['aws-sdk', 'aws-crt'],
+  // https://blog.logrocket.com/transpile-es-modules-with-webpack-node-js/
+  // experiments: {
+  //     outputModule: true,
+  // },
 }

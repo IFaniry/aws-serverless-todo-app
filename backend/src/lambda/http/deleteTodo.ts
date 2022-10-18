@@ -22,7 +22,6 @@ export const handler = middy(
     const userId = getUserId(event)
     const todoId = event.pathParameters.todoId
     
-    // TODO: Remove a TODO item by id
     await deleteTodoItem({ userId, todoId })
 
     return {
@@ -34,9 +33,9 @@ export const handler = middy(
 
 handler
   .use(httpErrorHandler())
+  .use(errorLogger())
   .use(
     cors({
       credentials: true
     })
   )
-  .use(errorLogger())

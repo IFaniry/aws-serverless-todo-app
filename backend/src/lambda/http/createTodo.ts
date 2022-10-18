@@ -7,7 +7,6 @@ import errorLogger from '@middy/error-logger'
 import cors from '@middy/http-cors'
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
 import { getUserId } from '../utils';
-// import { createTodo } from '../../businessLogic/todos'
 import { createTodoItem } from '../../helpers/todos'
 import { createDbConnection } from '../../helpers/todosAccess'
 
@@ -16,7 +15,6 @@ createDbConnection()
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const newTodo: CreateTodoRequest = JSON.parse(event.body as string)
-    // TODO: Implement creating a new TODO item
 
     const userId = getUserId(event)
 
@@ -32,9 +30,9 @@ export const handler = middy(
 
 handler
   .use(httpErrorHandler())
+  .use(errorLogger())
   .use(
     cors({
       credentials: true
     })
   )
-  .use(errorLogger())

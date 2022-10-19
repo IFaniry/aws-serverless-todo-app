@@ -1,7 +1,7 @@
 import * as AWSXRay from 'aws-xray-sdk'
 import { S3, PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { entityManager } from '../dataAccess/todosAccess'
+import { getEntityManager } from '../dataAccess/todosAccess'
 // https://github.com/ai/nanoid/issues/364#issuecomment-1150173952
 const { nanoid } = require('nanoid')
 
@@ -23,6 +23,8 @@ export async function createAttachmentPresignedUrl(todoId: string, userId: strin
   logger.info(`AWS_REGION: "${process.env.AWS_REGION}"`)
   logger.info(`ATTACHMENT_S3_BUCKET: "${process.env.ATTACHMENT_S3_BUCKET}"`)
   logger.info(`SIGNED_URL_EXPIRATION: "${process.env.SIGNED_URL_EXPIRATION}"`)
+
+  const entityManager = getEntityManager()
 
   const todoItem = await entityManager.findOne(
     TodoEntity,

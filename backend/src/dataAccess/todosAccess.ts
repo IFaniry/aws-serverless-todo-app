@@ -7,9 +7,11 @@ import * as AWSXRay from 'aws-xray-sdk'
 import { DocumentClientV3 } from '@typedorm/document-client'
 import { DynamoDB } from '@aws-sdk/client-dynamodb'
 
-import { createConnection, getEntityManager } from '@typedorm/core'
+import { createConnection } from '@typedorm/core'
 import { createLogger } from '../utils/logger'
 import { todosTable, TodoEntity } from '../models/TodoItem'
+
+export { getEntityManager } from '@typedorm/core'
 
 const logger = createLogger('TodosAccess')
 
@@ -35,5 +37,3 @@ export function createDbConnection() {
     documentClient,
   })
 }
-
-export const entityManager = getEntityManager()

@@ -7,10 +7,10 @@ import errorLogger from '@middy/error-logger'
 import cors from '@middy/http-cors'
 import * as createError from 'http-errors'
 
-import { createAttachmentPresignedUrl } from '../../helpers/attachmentUtils'
-import { updateTodoAttachmentUrl } from '../../helpers/todos'
-import { createDbConnection } from '../../helpers/todosAccess'
-import { getUserId } from '../utils'
+import { createAttachmentPresignedUrl } from '../../mediaLogic/todosAttachments'
+import { updateTodoAttachmentUrl } from '../../businessLogic/todos'
+import { createDbConnection } from '../../dataAccess/todosAccess'
+import { getUserId } from '../auth/utils'
 
 createDbConnection()
 

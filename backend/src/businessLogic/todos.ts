@@ -2,7 +2,7 @@ import { z } from 'zod'
 import * as createError from 'http-errors'
 import { fromZodError } from 'zod-validation-error'
 import { ZodError } from 'zod'
-import { getEntityManager } from '@typedorm/core'
+import { entityManager } from '../dataAccess/todosAccess'
 import { QUERY_ORDER } from '@typedorm/common'
 
 import { createLogger } from '../utils/logger'
@@ -14,8 +14,6 @@ import { createdAtLSI } from '../models/TodoItem'
 const logger = createLogger('TodosAccess')
 
 export async function getTodoItems(userId: string): Promise<TodoEntity[]> {
-  const entityManager = getEntityManager()
-
   const { items: todoItems } = await entityManager.find(
     TodoEntity,
     { userId },
@@ -56,8 +54,6 @@ export async function createTodoItem(userId: string, payload: CreateTodoRequest)
 
   logger.info(`Creating a Todo named: ${name} and due on ${dueDate}`)
 
-  const entityManager = getEntityManager()
-
   const createdTodoItem = await entityManager.create<TodoEntity>(todoItem)
 
   return createdTodoItem
@@ -97,8 +93,6 @@ export async function updateTodoItem(
       )
     }
   }
-
-  const entityManager = getEntityManager()
 
   logger.info('Updating a Todo with payload:', payload)
 
@@ -144,8 +138,6 @@ logger.info('todoId: ', todoId)
     }
   }
 
-  const entityManager = getEntityManager()
-
   logger.info('Updating a Todo attachmentUrl with payload:', { attachmentUrl })
 
   await entityManager.update(
@@ -181,8 +173,6 @@ export async function deleteTodoItem(
       )
     }
   }
-
-  const entityManager = getEntityManager()
 
   await entityManager.delete(TodoEntity, { userId, todoId })
 }

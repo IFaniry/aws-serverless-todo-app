@@ -6,9 +6,9 @@ import httpErrorHandler from '@middy/http-error-handler'
 import errorLogger from '@middy/error-logger'
 import cors from '@middy/http-cors'
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
-import { getUserId } from '../utils';
-import { createTodoItem } from '../../helpers/todos'
-import { createDbConnection } from '../../helpers/todosAccess'
+import { getUserId } from '../auth/utils';
+import { createTodoItem } from '../../businessLogic/todos'
+import { createDbConnection } from '../../dataAccess/todosAccess'
 
 createDbConnection()
 
@@ -18,12 +18,12 @@ export const handler = middy(
 
     const userId = getUserId(event)
 
-    await createTodoItem(userId, newTodo)
+    const createdTodo = await createTodoItem(userId, newTodo)
     
     return {
       statusCode: 201,
       body: JSON.stringify({
-        item: newTodo
+        item: createdTodo
       })
     }
 })

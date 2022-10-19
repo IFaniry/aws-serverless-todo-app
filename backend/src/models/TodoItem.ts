@@ -28,8 +28,8 @@ export const todoItemSchema = z.object({
   userId: z.string(),
   todoId: z.string(),
   createdAt: z.string(),
-  name: z.string(),
-  dueDate: z.string(),
+  name: z.string().min(1),
+  dueDate: z.string().min(1),
   done: z.boolean(),
   attachmentUrl: z.string().optional(),
 })
@@ -83,7 +83,9 @@ export class TodoEntity {
   @Attribute()
   dueDate!: string
 
-  @Attribute()
+  @Attribute({
+    default: false,
+  })
   done!: boolean
 
   @Attribute()

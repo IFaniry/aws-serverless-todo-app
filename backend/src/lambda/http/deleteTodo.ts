@@ -7,9 +7,9 @@ import errorLogger from '@middy/error-logger'
 import cors from '@middy/http-cors'
 import * as createError from 'http-errors'
 
-import { deleteTodoItem } from '../../helpers/todos'
-import { getUserId } from '../utils'
-import { createDbConnection } from '../../helpers/todosAccess'
+import { deleteTodoItem } from '../../businessLogic/todos'
+import { getUserId } from '../auth/utils'
+import { createDbConnection } from '../../dataAccess/todosAccess'
 
 createDbConnection()
 

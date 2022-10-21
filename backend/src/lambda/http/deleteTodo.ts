@@ -9,7 +9,7 @@ import * as createError from 'http-errors'
 
 import { deleteTodoItem } from '../../businessLogic/todos'
 import { getUserId } from '../auth/utils'
-import { createDbConnection } from '../../dataAccess/todosAccess'
+import { createDbConnection } from '../../dataLayer/todosAccess'
 
 createDbConnection()
 

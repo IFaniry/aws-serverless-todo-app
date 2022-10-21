@@ -9,7 +9,7 @@ import * as createError from 'http-errors'
 
 import { createAttachmentPresignedUrl } from '../../mediaLogic/todosAttachments'
 import { updateTodoAttachmentUrl } from '../../businessLogic/todos'
-import { createDbConnection } from '../../dataAccess/todosAccess'
+import { createDbConnection } from '../../dataLayer/todosAccess'
 import { getUserId } from '../auth/utils'
 
 createDbConnection()

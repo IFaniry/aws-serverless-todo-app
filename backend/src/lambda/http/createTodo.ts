@@ -8,7 +8,7 @@ import cors from '@middy/http-cors'
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
 import { getUserId } from '../auth/utils';
 import { createTodoItem } from '../../businessLogic/todos'
-import { createDbConnection } from '../../dataAccess/todosAccess'
+import { createDbConnection } from '../../dataLayer/todosAccess'
 
 createDbConnection()
 
